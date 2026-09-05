@@ -95,6 +95,18 @@ public class CitaControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+@Test
+void testCrear_MedicoVacio_Fallido() throws Exception {
+    String jsonInvalido = "{\"pacienteId\":1,\"medicoId\":null,\"estado\":\"PENDIENTE\"}";
+
+    mockMvc.perform(post("/citas")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonInvalido))
+            .andExpect(status().isBadRequest());
+}
+
+
+
     // --- PUT /citas/{id}/estado ---
     @Test
     void testActualizarEstado_Exitoso() throws Exception {
@@ -112,4 +124,15 @@ public class CitaControllerTest {
                 .content("CANCELADA"))
                 .andExpect(status().isNotFound());
     }
+
+@Test
+void testActualizarEstado_MetodoInvalido_Fallido() throws Exception {
+    mockMvc.perform(post("/citas/1/estado")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("ATENDIDA"))
+            .andExpect(status().isMethodNotAllowed());
+}
+
+
+    
 }
