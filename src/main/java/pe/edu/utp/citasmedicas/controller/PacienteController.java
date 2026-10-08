@@ -4,33 +4,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.utp.citasmedicas.model.Paciente;
+import pe.edu.utp.citasmedicas.repository.PacienteRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/pacientes")
 public class PacienteController {
 
-    private final List<Paciente> pacientes = new ArrayList<>();
+    private final PacienteRepository pacienteRepository;
 
-    public PacienteController() {
-        pacientes.add(new Paciente(1L, "Juan Perez", "12345678", "juan@test.com"));
-        pacientes.add(new Paciente(2L, "Maria Lopez", "87654321", "maria@test.com"));
+    public PacienteController(PacienteRepository pacienteRepository) {
+        this.pacienteRepository = pacienteRepository;
     }
 
     @GetMapping
     public ResponseEntity<List<Paciente>> listarTodos() {
-        return ResponseEntity.ok(pacientes);
+        return ResponseEntity.ok(pacienteRepository.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id) {
-        return pacientes.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        Optional<Paciente> paciente = pacienteRepository.findById(id);
+        if (paciente.isPresent()) {
+            return ResponseEntity.ok(paciente.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PostMapping
@@ -39,15 +39,14 @@ public class PacienteController {
             paciente.getNombre() == null || paciente.getNombre().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        paciente.setId((long) (pacientes.size() + 1));
-        pacientes.add(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paciente);
+        Paciente guardado = pacienteRepository.save(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        boolean eliminado = pacientes.removeIf(p -> p.getId().equals(id));
-        if (eliminado) {
+        if (pacienteRepository.existsById(id)) {
+            pacienteRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
