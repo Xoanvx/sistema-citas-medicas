@@ -4,68 +4,50 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.utp.citasmedicas.model.Cita;
+import pe.edu.utp.citasmedicas.repository.CitaRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/citas")
 public class CitaController {
 
-    private final List<Cita> citas = new ArrayList<>();
+    private final CitaRepository citaRepository;
 
-    public CitaController() {
-        citas.add(new Cita(1L, 1L, 1L, "PENDIENTE"));
-        citas.add(new Cita(2L, 2L, 2L, "CONFIRMADA"));
+    public CitaController(CitaRepository citaRepository) {
+        this.citaRepository = citaRepository;
     }
 
-    // GET /citas
     @GetMapping
     public ResponseEntity<List<Cita>> listarTodas() {
-        return ResponseEntity.ok(citas);
+        return ResponseEntity.ok(citaRepository.findAll());
     }
 
-    // GET /citas/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Cita> buscarPorId(@PathVariable Long id) {
-        return citas.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        Optional<Cita> cita = citaRepository.findById(id);
+        if (cita.isPresent()) {
+            return ResponseEntity.ok(cita.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // POST /citas
     @PostMapping
     public ResponseEntity<Cita> crear(@RequestBody Cita cita) {
-
-        if (cita.getPacienteId() == null ||
-            cita.getMedicoId() == null ||
-            cita.getEstado() == null ||
-            cita.getEstado().trim().isEmpty()) {
-
+        if (cita.getPacienteId() == null || cita.getMedicoId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        cita.setId((long) (citas.size() + 1));
-        citas.add(cita);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(cita);
+        Cita guardada = citaRepository.save(cita);
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
     }
 
-    // PUT /citas/{id}/estado
-    @PutMapping("/{id}/estado")
-    public ResponseEntity<Cita> actualizarEstado(
-            @PathVariable Long id,
-            @RequestBody String nuevoEstado) {
-
-        return citas.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .map(cita -> {
-                    cita.setEstado(nuevoEstado);
-                    return ResponseEntity.ok(cita);
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (citaRepository.existsById(id)) {
+            citaRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
