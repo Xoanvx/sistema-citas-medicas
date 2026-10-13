@@ -1,21 +1,41 @@
 package pe.edu.utp.citasmedicas;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import pe.edu.utp.citasmedicas.model.Cita;
+import pe.edu.utp.citasmedicas.repository.CitaRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
 public class CitaControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private CitaRepository citaRepository;
+
+    private Long idCita1;
+    private Long idCita2;
+
+    @BeforeEach
+    void setUp() {
+        citaRepository.deleteAll();
+        Cita c1 = citaRepository.save(new Cita(null, 1L, 1L, "PENDIENTE"));
+        Cita c2 = citaRepository.save(new Cita(null, 2L, 2L, "CONFIRMADA"));
+        idCita1 = c1.getId();
+        idCita2 = c2.getId();
+    }
 
     // --- GET /citas ---
     @Test
@@ -41,7 +61,7 @@ public class CitaControllerTest {
     // --- GET /citas/{id} ---
     @Test
     void testBuscarPorId_Exitoso() throws Exception {
-        mockMvc.perform(get("/citas/1"))
+        mockMvc.perform(get("/citas/" + idCita1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pacienteId").value(1))
                 .andExpect(jsonPath("$.medicoId").value(1));
@@ -49,14 +69,14 @@ public class CitaControllerTest {
 
     @Test
     void testBuscarPorId_SegundaCita_Exitoso() throws Exception {
-        mockMvc.perform(get("/citas/2"))
+        mockMvc.perform(get("/citas/" + idCita2))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("CONFIRMADA"));
     }
 
     @Test
     void testBuscarPorId_NoExiste_Fallido() throws Exception {
-        mockMvc.perform(get("/citas/999"))
+        mockMvc.perform(get("/citas/999999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -95,22 +115,20 @@ public class CitaControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-@Test
-void testCrear_MedicoVacio_Fallido() throws Exception {
-    String jsonInvalido = "{\"pacienteId\":1,\"medicoId\":null,\"estado\":\"PENDIENTE\"}";
+    @Test
+    void testCrear_MedicoVacio_Fallido() throws Exception {
+        String jsonInvalido = "{\"pacienteId\":1,\"medicoId\":null,\"estado\":\"PENDIENTE\"}";
 
-    mockMvc.perform(post("/citas")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonInvalido))
-            .andExpect(status().isBadRequest());
-}
-
-
+        mockMvc.perform(post("/citas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonInvalido))
+                .andExpect(status().isBadRequest());
+    }
 
     // --- PUT /citas/{id}/estado ---
     @Test
     void testActualizarEstado_Exitoso() throws Exception {
-        mockMvc.perform(put("/citas/1/estado")
+        mockMvc.perform(put("/citas/" + idCita1 + "/estado")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("CANCELADA"))
                 .andExpect(status().isOk())
@@ -119,20 +137,30 @@ void testCrear_MedicoVacio_Fallido() throws Exception {
 
     @Test
     void testActualizarEstado_NoExiste_Fallido() throws Exception {
-        mockMvc.perform(put("/citas/999/estado")
+        mockMvc.perform(put("/citas/999999/estado")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("CANCELADA"))
                 .andExpect(status().isNotFound());
     }
 
-@Test
-void testActualizarEstado_MetodoInvalido_Fallido() throws Exception {
-    mockMvc.perform(post("/citas/1/estado")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("ATENDIDA"))
-            .andExpect(status().isMethodNotAllowed());
-}
+    @Test
+    void testActualizarEstado_MetodoInvalido_Fallido() throws Exception {
+        mockMvc.perform(post("/citas/" + idCita1 + "/estado")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("ATENDIDA"))
+                .andExpect(status().isMethodNotAllowed());
+    }
 
+    // --- DELETE /citas/{id} ---
+    @Test
+    void testEliminar_Exitoso() throws Exception {
+        mockMvc.perform(delete("/citas/" + idCita1))
+                .andExpect(status().isNoContent());
+    }
 
-    
+    @Test
+    void testEliminar_NoExiste_Fallido() throws Exception {
+        mockMvc.perform(delete("/citas/999999"))
+                .andExpect(status().isNotFound());
+    }
 }

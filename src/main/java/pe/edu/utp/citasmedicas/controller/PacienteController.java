@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/pacientes")
+@RequestMapping({"/pacientes", "/api/pacientes"})
 public class PacienteController {
 
     private final PacienteRepository pacienteRepository;
@@ -41,6 +41,24 @@ public class PacienteController {
         }
         Paciente guardado = pacienteRepository.save(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Paciente> actualizar(@PathVariable Long id, @RequestBody Paciente paciente) {
+        Optional<Paciente> pacienteExistente = pacienteRepository.findById(id);
+        if (pacienteExistente.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (paciente.getDni() == null || paciente.getDni().trim().isEmpty() ||
+            paciente.getNombre() == null || paciente.getNombre().trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        Paciente actual = pacienteExistente.get();
+        actual.setNombre(paciente.getNombre());
+        actual.setDni(paciente.getDni());
+        actual.setCorreo(paciente.getCorreo());
+        Paciente actualizado = pacienteRepository.save(actual);
+        return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")

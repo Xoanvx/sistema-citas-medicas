@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/citas")
+@RequestMapping({"/citas", "/api/citas"})
 public class CitaController {
 
     private final CitaRepository citaRepository;
@@ -40,6 +40,33 @@ public class CitaController {
         }
         Cita guardada = citaRepository.save(cita);
         return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Cita> actualizar(@PathVariable Long id, @RequestBody Cita cita) {
+        Optional<Cita> citaExistente = citaRepository.findById(id);
+        if (citaExistente.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Cita actual = citaExistente.get();
+        actual.setPacienteId(cita.getPacienteId());
+        actual.setMedicoId(cita.getMedicoId());
+        actual.setEstado(cita.getEstado());
+        Cita actualizada = citaRepository.save(actual);
+        return ResponseEntity.ok(actualizada);
+    }
+
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<Cita> actualizarEstado(@PathVariable Long id, @RequestBody String nuevoEstado) {
+        Optional<Cita> citaExistente = citaRepository.findById(id);
+        if (citaExistente.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Cita actual = citaExistente.get();
+        String estadoLimpio = nuevoEstado != null ? nuevoEstado.replace("\"", "").trim() : "";
+        actual.setEstado(estadoLimpio);
+        Cita actualizada = citaRepository.save(actual);
+        return ResponseEntity.ok(actualizada);
     }
 
     @DeleteMapping("/{id}")
