@@ -1,0 +1,38 @@
+<section class="form-container">
+  <h2>Reprogramar Cita</h2>
+
+  <form [formGroup]="reprogramarForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="rep-cita-id">ID de la Cita</label>
+      <input id="rep-cita-id" type="number" formControlName="citaId" min="1" />
+      @if (reprogramarForm.get('citaId')?.touched && reprogramarForm.get('citaId')?.invalid) {
+        <small class="error">El ID de la cita es obligatorio.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="rep-fecha">Nueva Fecha</label>
+      <input id="rep-fecha" type="date" formControlName="fecha" />
+      @if (reprogramarForm.get('fecha')?.touched && reprogramarForm.get('fecha')?.invalid) {
+        <small class="error">La nueva fecha es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="rep-hora">Nueva Hora</label>
+      <input id="rep-hora" type="time" formControlName="hora" />
+      @if (reprogramarForm.get('hora')?.touched && reprogramarForm.get('hora')?.invalid) {
+        <small class="error">La nueva hora es obligatoria.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="reprogramarForm.invalid">Reprogramar</button>
+  </form>
+
+  @if (mensaje) {
+    <p class="success">{{ mensaje }}</p>
+  }
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</section>

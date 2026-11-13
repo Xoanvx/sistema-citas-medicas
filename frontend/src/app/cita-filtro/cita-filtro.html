@@ -1,0 +1,65 @@
+<section class="form-container">
+  <h2>Filtrar Citas por Rango de Fechas</h2>
+
+  <form [formGroup]="filtroForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="filtro-inicio">Desde</label>
+      <input id="filtro-inicio" type="date" formControlName="fechaInicio" />
+      @if (filtroForm.get('fechaInicio')?.touched && filtroForm.get('fechaInicio')?.invalid) {
+        <small class="error">La fecha inicial es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="filtro-fin">Hasta</label>
+      <input id="filtro-fin" type="date" formControlName="fechaFin" />
+      @if (filtroForm.get('fechaFin')?.touched && filtroForm.get('fechaFin')?.invalid) {
+        <small class="error">La fecha final es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="filtro-paciente">ID del Paciente (opcional)</label>
+      <input id="filtro-paciente" type="number" formControlName="pacienteId" min="1" />
+    </div>
+
+    <button type="submit" [disabled]="filtroForm.invalid">Filtrar</button>
+  </form>
+
+  @if (mensaje) {
+    <p class="success">{{ mensaje }}</p>
+  }
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Paciente ID</th>
+        <th>Médico ID</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of citasFiltradas; track c.id) {
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.pacienteId }}</td>
+          <td>{{ c.medicoId }}</td>
+          <td>{{ c.fecha || '-' }}</td>
+          <td>{{ c.hora || '-' }}</td>
+          <td>{{ c.estado }}</td>
+          <td>
+            <button type="button" (click)="anularCita(c.id)">Anular</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">No hay citas en el rango seleccionado.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

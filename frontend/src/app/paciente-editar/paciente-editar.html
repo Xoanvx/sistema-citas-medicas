@@ -1,0 +1,57 @@
+<section class="form-container">
+  <h2>Editar Paciente</h2>
+
+  <form [formGroup]="editarForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="edit-id">ID del Paciente</label>
+      <div class="inline-group">
+        <input id="edit-id" type="number" formControlName="id" min="1" />
+        <button type="button" (click)="cargarPaciente()">Cargar datos</button>
+      </div>
+      @if (editarForm.get('id')?.touched && editarForm.get('id')?.invalid) {
+        <small class="error">El ID del paciente es obligatorio.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="edit-nombre">Nombre</label>
+      <input id="edit-nombre" type="text" formControlName="nombre" />
+      @if (editarForm.get('nombre')?.touched && editarForm.get('nombre')?.invalid) {
+        <small class="error">El nombre es obligatorio.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="edit-apellidos">Apellidos</label>
+      <input id="edit-apellidos" type="text" formControlName="apellidos" />
+      @if (editarForm.get('apellidos')?.touched && editarForm.get('apellidos')?.invalid) {
+        <small class="error">Los apellidos son obligatorios.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="edit-dni">DNI</label>
+      <input id="edit-dni" type="text" formControlName="dni" maxlength="8" />
+      @if (editarForm.get('dni')?.touched && editarForm.get('dni')?.invalid) {
+        <small class="error">Ingrese un DNI válido de 8 dígitos.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="edit-correo">Correo electrónico</label>
+      <input id="edit-correo" type="email" formControlName="correo" />
+      @if (editarForm.get('correo')?.touched && editarForm.get('correo')?.invalid) {
+        <small class="error">Ingrese un correo electrónico válido.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="editarForm.invalid">Actualizar</button>
+  </form>
+
+  @if (mensaje) {
+    <p class="success">{{ mensaje }}</p>
+  }
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</section>

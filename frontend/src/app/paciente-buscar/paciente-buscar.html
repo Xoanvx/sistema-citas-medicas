@@ -1,0 +1,45 @@
+<section class="form-container">
+  <h2>Buscar Paciente por DNI</h2>
+
+  <form [formGroup]="buscarForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="buscar-dni">DNI</label>
+      <input id="buscar-dni" type="text" formControlName="dni" maxlength="8" placeholder="Ej. 12345678" />
+      @if (buscarForm.get('dni')?.touched && buscarForm.get('dni')?.invalid) {
+        <small class="error">Ingrese un DNI numérico (hasta 8 dígitos).</small>
+      }
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="buscarForm.invalid">Buscar</button>
+      <button type="button" (click)="limpiar()">Limpiar</button>
+    </div>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellidos</th>
+        <th>DNI</th>
+        <th>Correo</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of pacientesFiltrados; track p.id) {
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.apellidos || '-' }}</td>
+          <td>{{ p.dni }}</td>
+          <td>{{ p.correo }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">No se encontraron pacientes.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

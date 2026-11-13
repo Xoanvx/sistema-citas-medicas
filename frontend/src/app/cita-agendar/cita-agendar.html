@@ -1,0 +1,46 @@
+<section class="form-container">
+  <h2>Agendar Cita Médica</h2>
+
+  <form [formGroup]="citaForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="cita-fecha">Fecha</label>
+      <input id="cita-fecha" type="date" formControlName="fecha" />
+      @if (citaForm.get('fecha')?.touched && citaForm.get('fecha')?.invalid) {
+        <small class="error">La fecha es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="cita-hora">Hora</label>
+      <input id="cita-hora" type="time" formControlName="hora" />
+      @if (citaForm.get('hora')?.touched && citaForm.get('hora')?.invalid) {
+        <small class="error">La hora es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="cita-medico">ID del Médico</label>
+      <input id="cita-medico" type="number" formControlName="medicoId" min="1" />
+      @if (citaForm.get('medicoId')?.touched && citaForm.get('medicoId')?.invalid) {
+        <small class="error">El ID del médico es obligatorio.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="cita-paciente">ID del Paciente</label>
+      <input id="cita-paciente" type="number" formControlName="pacienteId" min="1" />
+      @if (citaForm.get('pacienteId')?.touched && citaForm.get('pacienteId')?.invalid) {
+        <small class="error">El ID del paciente es obligatorio.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="citaForm.invalid">Agendar Cita</button>
+  </form>
+
+  @if (mensaje) {
+    <p class="success">{{ mensaje }}</p>
+  }
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</section>

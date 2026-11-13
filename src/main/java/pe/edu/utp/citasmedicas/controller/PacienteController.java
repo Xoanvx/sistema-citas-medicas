@@ -55,6 +55,7 @@ public class PacienteController {
         }
         Paciente actual = pacienteExistente.get();
         actual.setNombre(paciente.getNombre());
+        actual.setApellidos(paciente.getApellidos());
         actual.setDni(paciente.getDni());
         actual.setCorreo(paciente.getCorreo());
         Paciente actualizado = pacienteRepository.save(actual);

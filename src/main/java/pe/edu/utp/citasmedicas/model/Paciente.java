@@ -15,6 +15,7 @@ public class Paciente {
     private Long id;
 
     private String nombre;
+    private String apellidos;
     private String dni;
     private String correo;
 
@@ -24,6 +25,14 @@ public class Paciente {
     public Paciente(Long id, String nombre, String dni, String correo) {
         this.id = id;
         this.nombre = nombre;
+        this.dni = dni;
+        this.correo = correo;
+    }
+
+    public Paciente(Long id, String nombre, String apellidos, String dni, String correo) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
         this.dni = dni;
         this.correo = correo;
     }
@@ -42,6 +51,14 @@ public class Paciente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
     public String getDni() {

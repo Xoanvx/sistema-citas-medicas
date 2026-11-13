@@ -1,0 +1,46 @@
+<section class="form-container">
+  <h2>Registrar Paciente</h2>
+
+  <form [formGroup]="pacienteForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="reg-nombre">Nombre</label>
+      <input id="reg-nombre" type="text" formControlName="nombre" />
+      @if (pacienteForm.get('nombre')?.touched && pacienteForm.get('nombre')?.invalid) {
+        <small class="error">El nombre es obligatorio (mínimo 2 caracteres).</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="reg-apellidos">Apellidos</label>
+      <input id="reg-apellidos" type="text" formControlName="apellidos" />
+      @if (pacienteForm.get('apellidos')?.touched && pacienteForm.get('apellidos')?.invalid) {
+        <small class="error">Los apellidos son obligatorios.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="reg-dni">DNI</label>
+      <input id="reg-dni" type="text" formControlName="dni" maxlength="8" />
+      @if (pacienteForm.get('dni')?.touched && pacienteForm.get('dni')?.invalid) {
+        <small class="error">Ingrese un DNI válido de 8 dígitos.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="reg-correo">Correo electrónico</label>
+      <input id="reg-correo" type="email" formControlName="correo" />
+      @if (pacienteForm.get('correo')?.touched && pacienteForm.get('correo')?.invalid) {
+        <small class="error">Ingrese un correo electrónico válido.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="pacienteForm.invalid">Registrar</button>
+  </form>
+
+  @if (mensaje) {
+    <p class="success">{{ mensaje }}</p>
+  }
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</section>
